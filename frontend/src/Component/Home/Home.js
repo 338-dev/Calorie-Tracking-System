@@ -1,4 +1,4 @@
- import { Box, Button, Center, Grid, GridItem, Input, useToast } from '@chakra-ui/react'
+ import { Box, Button, Center, Grid, GridItem, Input, Link, useToast } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import CreateModal from '../CreateModal/CreateModal'
@@ -9,8 +9,10 @@ import {SearchIcon} from '@chakra-ui/icons'
 import axios from 'axios'
 import { useCookies } from 'react-cookie'
 import { fetchFilteredFoodDetails, fetchFoodDetails, fetchUser } from '../../redux/action'
+import { useNavigate } from 'react-router-dom'
 
 export const Home = ({state,fetchFilteredFoodDetails}) => {
+  const navigate=useNavigate();
   const [DateFilter, setDateFilter] = useState({
     startDate:'',
     endDate:''
@@ -48,6 +50,21 @@ else{
   return (
     <div>
       <Navbar/>
+      {state.user.role==='admin'&&<Box backgroundColor="lightgrey" width='70%' margin='auto' borderRadius='0 0 10px 10px'>
+        <Grid templateColumns='repeat(2, 1fr)' gap={6}>
+          <Center >
+          <Link onClick={()=>navigate('/')}>
+          Home
+          </Link>
+       
+          </Center>
+          <Center>
+          <Link onClick={()=>navigate('/allusers')}>
+          All Users
+          </Link>
+          </Center>
+        </Grid>
+      </Box>}
       <Center>
       <Grid templateColumns='repeat(3, 1fr)' gap={6} mt='20px'>
   <GridItem w='100%' h='10'>

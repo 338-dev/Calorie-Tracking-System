@@ -2,14 +2,21 @@ import { Box, Card, CardBody, Center, Divider, Flex, Grid, GridItem, Spacer, Tex
 import React, { useEffect } from 'react'
 import { useCookies } from 'react-cookie';
 import { connect } from 'react-redux'
-import { fetchUser,fetchFoodDetails } from '../../redux/action'
+import { fetchUser,fetchFoodDetails, fetchFoodDetailsByUsers } from '../../redux/action'
 import calories from '../../Images/calories.png'
 import money from '../../Images/money.png'
-export const FoodList = ({state,fetchUser,fetchFoodDetails}) => {
+export const FoodList = ({state,fetchUser,fetchFoodDetails,fetchFoodDetailsByUsers}) => {
   const [cookies, setCookie] = useCookies(["user"]);
 
   useEffect(() => {
-    fetchFoodDetails(cookies)
+    if(window.location.pathname==='/')
+      fetchFoodDetails(cookies)
+    else{
+      fetchFoodDetailsByUsers(cookies,window.location.pathname.split('/')[2])
+    console.log('23')}
+    console.log('23')
+
+
   }, [])
   console.log(state)
   
@@ -31,29 +38,29 @@ export const FoodList = ({state,fetchUser,fetchFoodDetails}) => {
         <Grid templateColumns='repeat(3, 1fr)' gap={6}>
 
   {
-    Object.keys(state.foodDetails[value]).map((val,kee)=>(
+    Object.keys(state.foodDetails[value].days).map((val,kee)=>(
       <>
        
       {
-        Object.keys(state.foodDetails[value][val]).map((vall,keee)=>(
+        Object.keys(state.foodDetails[value]['days'][val]).map((vall,keee)=>(
             
         <Card minW="200px" m="20px">
   <CardBody>
     <Flex>
-    <Text fontSize='2xl'>{state.foodDetails[value][val][vall].name}</Text>
+    <Text fontSize='2xl'>{state.foodDetails[value]['days'][val][vall].name}</Text>
     <Spacer/>
     <Flex>
-    {state.foodDetails[value][val][vall].calorie&&<><img src={calories} alt="calories" width='40px'/>
-    <Text mt='10px'>{state.foodDetails[value][val][vall].calorie}</Text></>}
+    {state.foodDetails[value]['days'][val][vall].calorie&&<><img src={calories} alt="calories" width='40px'/>
+    <Text mt='10px'>{state.foodDetails[value]['days'][val][vall].calorie}</Text></>}
     </Flex>
 
     </Flex>
     <Flex>
-    <Text>{state.foodDetails[value][val][vall].date}</Text>
+    <Text mt="12px">{state.foodDetails[value]['days'][val][vall].date.split(' ').splice(0,3).join(' ')}</Text>
     <Spacer/>
     <Flex>
     <img src={money} alt="price" width="40px"/>
-    <Text mt="10px">{state.foodDetails[value][val][vall].price}</Text>
+    <Text mt="10px">{state.foodDetails[value]['days'][val][vall].price}</Text>
 
     </Flex>
     </Flex>
@@ -83,7 +90,9 @@ const mapDispatchToProps = dispatch => {
   return{
       fetchUser: (cookie) => dispatch(fetchUser(cookie)),
       fetchFoodDetails: (cookie) => dispatch(fetchFoodDetails(cookie)),
-  }
+      fetchFoodDetailsByUsers: (cookie,id) => dispatch(fetchFoodDetailsByUsers(cookie,id)),
+
+    }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(FoodList)

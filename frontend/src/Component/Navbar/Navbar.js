@@ -17,7 +17,7 @@ export const Navbar = (props) => {
   return (
     <Flex bg='white' boxShadow='lg' p='4' rounded='md'>
     <Box >
-      <Flex>
+      <Flex onClick={()=>navigate('/')}>
       <img src={AppIcon} alt="icon" width={'40px'}/>
       <Text fontSize='2xl'>CalorieTrac</Text>
       </Flex>

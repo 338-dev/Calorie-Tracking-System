@@ -46,6 +46,7 @@ export class foodController {
   @Get('/:id')
   async foodByUser(@Auth() auth,@Param('id') id,@Headers() headers): Promise<[]> {
     const token = headers.jwt;
+    console.log(id)
       // const decoded:any = jwt.verify(token,'secret');
       // const id = decoded.id;
       // const user = await User.findOne({where: {id}});
@@ -243,7 +244,7 @@ export class foodController {
 //         return this.bikesService.update(bikesData,id);
 //     }
     // @RoleGuard(ERole.M)
-    @UseGuards(AuthGuard)
+    // @UseGuards(AuthGuard)
     @Delete(':id/delete')
     async delete(@Param('id') id): Promise<any> {
      

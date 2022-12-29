@@ -23,15 +23,30 @@ async  findAll(userRole:any,userId:any): Promise<Food[]|any> {
     console.log('tempFood')
     const detailsByMonths={}
     tempFood.forEach(element=>{
-      if(new Date(element.date).toLocaleString('default', { month: 'long' }) in detailsByMonths===false)
+      if(new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear() in detailsByMonths===false)
       {
-        detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })]={}
+        detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]={days:{},monthlyExpenses:0,expenseLimitReached:false}
       }
-      if(new Date(element.date).getDate() in detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })]===false)
+      if(new Date(element.date).getDate() in detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()].days===false)
       {
-        detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })][new Date(element.date).getDate()]=[]
+        detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()]=[]
       }
-      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })][new Date(element.date).getDate()].push(element)
+      let calorieLimitReached;
+      if(Number(element.calorie)>=2.100)
+      {
+        calorieLimitReached=true;
+      }
+      else{
+        calorieLimitReached=false
+      }
+      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()].push({...element,calorieLimitReached:calorieLimitReached})
+      
+      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['monthlyExpenses']+=Number(element.price)
+
+      if(detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['monthlyExpenses']>1.00)
+      {
+        detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['expenseLimitReached']=true
+      }
     })
     console.log(detailsByMonths)
     return detailsByMonths
@@ -39,19 +54,34 @@ async  findAll(userRole:any,userId:any): Promise<Food[]|any> {
 
 async  findById(userId:any): Promise<Food[]|any> {
   const tempFood= await this.foodRepository.find({where:{addedBy:userId}});
-  
+    
   console.log('tempFood')
   const detailsByMonths={}
   tempFood.forEach(element=>{
-    if(new Date(element.date).toLocaleString('default', { month: 'long' }) in detailsByMonths===false)
+    if(new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear() in detailsByMonths===false)
     {
-      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })]={}
+      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]={days:{},monthlyExpenses:0,expenseLimitReached:false}
     }
-    if(new Date(element.date).getDate() in detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })]===false)
+    if(new Date(element.date).getDate() in detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()].days===false)
     {
-      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })][new Date(element.date).getDate()]=[]
+      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()]=[]
     }
-    detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })][new Date(element.date).getDate()].push(element)
+    let calorieLimitReached;
+    if(Number(element.calorie)>=2.100)
+    {
+      calorieLimitReached=true;
+    }
+    else{
+      calorieLimitReached=false
+    }
+    detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()].push({...element,calorieLimitReached:calorieLimitReached})
+    
+    detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['monthlyExpenses']+=Number(element.price)
+
+    if(detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['monthlyExpenses']>1.00)
+    {
+      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['expenseLimitReached']=true
+    }
   })
   console.log(detailsByMonths)
   return detailsByMonths
@@ -68,15 +98,15 @@ async  findByDates(userRole:any,userId:any,dates:any): Promise<Food[]|any> {
     {
       return;
     }
-    if(new Date(element.date).toLocaleString('default', { month: 'long' }) in detailsByMonths===false)
+    if(new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear() in detailsByMonths===false)
     {
-      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })]={}
+      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]={}
     }
-    if(new Date(element.date).getDate() in detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })]===false)
+    if(new Date(element.date).getDate() in detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]===false)
     {
-      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })][new Date(element.date).getDate()]=[]
+      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()][new Date(element.date).getDate()]=[]
     }
-    detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })][new Date(element.date).getDate()].push(element)
+    detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()][new Date(element.date).getDate()].push(element)
   })
   console.log(detailsByMonths)
   return detailsByMonths

@@ -56,28 +56,28 @@ import { useCookies } from 'react-cookie';
 //     }
 //   }
 
-//   export const fetchAllUsers =() => {
-//     return (dispatch) => {
-//     if(JSON.parse(localStorage.getItem('token'))!==null)
-//     {
-//       dispatch(fetchAllUsersRequest())
-//        axios.get('https://bike-reserve-sys-bsr-12321.herokuapp.com/user',{
-//                 headers:{
-//                   jwt: JSON.parse(localStorage.getItem('token')).jwt
-//                 }
-//             })
-//         .then(response => {
-//           const events = response.data
-//           dispatch(fetchAllUsersSuccess(events))
+  export const fetchAllUsers =(cookie) => {
+    return (dispatch) => {
+    if(cookie.token!==null)
+    {
+      dispatch(fetchAllUsersRequest())
+       axios.get('http://localhost:3001/user',{
+                headers:{
+                  jwt: cookie.token
+                }
+            })
+        .then(response => {
+          const events = response.data
+          dispatch(fetchAllUsersSuccess(events))
   
-//         })
-//         .catch(error => {
-//           console.log(error)
-//           dispatch(fetchAllUsersFailure(error.message))
-//         })
-//     }
-//   }
-//   }
+        })
+        .catch(error => {
+          console.log(error)
+          dispatch(fetchAllUsersFailure(error.message))
+        })
+    }
+  }
+}
 
   export const fetchUser =(cookie) => {
     // const [cookies, setCookie] = useCookies(["user"]);
@@ -125,7 +125,31 @@ import { useCookies } from 'react-cookie';
         })}
     }
   }
+  export const fetchFoodDetailsByUsers =(cookie,id) => {
+    // const [cookies, setCookie] = useCookies(["user"]);
+    console.log(id)
+    console.log('id')
 
+    return (dispatch) => {
+      if(cookie.token!==null){
+        console.log(232323)
+      dispatch(fetchFoodDetailsRequest())
+        axios.get(`http://localhost:3001/food/${id}`,{
+                headers:{
+                  jwt: cookie.token
+                }
+            })
+        .then((data)=>{
+            console.log(data.data)
+            dispatch(fetchFoodDetailsSuccess(data.data))
+        })
+        .catch(error => {
+          
+            console.log(error)
+            dispatch(fetchFoodDetailsFailure(error.message))
+        })}
+    }
+  }
   export const fetchFilteredFoodDetails =(cookie,filterDates) => {
     // const [cookies, setCookie] = useCookies(["user"]);
     console.log(cookie)
@@ -230,11 +254,11 @@ import { useCookies } from 'react-cookie';
 //     }
 // }
 
-// export const fetchAllUsersRequest = () => {
-//   return {
-//       type: 'FETCH_ALL_USERS_REQUEST'
-//   }
-// }
+export const fetchAllUsersRequest = () => {
+  return {
+      type: 'FETCH_ALL_USERS_REQUEST'
+  }
+}
 
 // export const fetchBikesPagesRequest = () => {
 //   return {
@@ -280,12 +304,12 @@ export const fetchFoodDetailsRequest = () => {
 //     payload: events
 //   }
 // }
-// export const fetchAllUsersSuccess = events => {
-//   return {
-//     type: 'FETCH_ALL_USERS_SUCCESS',
-//     payload: events
-//   }
-// }
+export const fetchAllUsersSuccess = events => {
+  return {
+    type: 'FETCH_ALL_USERS_SUCCESS',
+    payload: events
+  }
+}
 export const fetchUserSuccess = events => {
     return {
       type: 'FETCH_USER_SUCCESS',
@@ -325,12 +349,12 @@ export const fetchFilterIsSet = () => {
 //   }
 // }
 
-// export const fetchAllUsersFailure = error => {
-//   return {
-//     type: 'FETCH_ALL_USERS_FAILURE',
-//     payload: error
-//   }
-// }
+export const fetchAllUsersFailure = error => {
+  return {
+    type: 'FETCH_ALL_USERS_FAILURE',
+    payload: error
+  }
+}
 
 export const fetchUserFailure = error => {
     return {

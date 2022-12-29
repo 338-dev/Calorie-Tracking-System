@@ -35,8 +35,8 @@ const schemaRegister = Joi.object({
 export class UserController {
   constructor(private readonly userService: UserService, private jwtService: JwtService) {}
   
-  // @RoleGuard(ERole.A)
-  // @UseGuards(AuthGuard)
+  @RoleGuard(ERole.A)
+  @UseGuards(AuthGuard)
   @Get()
   index(): Promise<User[]> {
     return this.userService.findAll();
