@@ -22,32 +22,34 @@ async  findAll(userRole:any,userId:any): Promise<Food[]|any> {
     
     console.log('tempFood')
     const detailsByMonths={}
-    tempFood.forEach(element=>{
-      if(new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear() in detailsByMonths===false)
-      {
-        detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]={days:{},monthlyExpenses:0,expenseLimitReached:false}
-      }
-      if(new Date(element.date).getDate() in detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()].days===false)
-      {
-        detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()]=[]
-      }
-      let calorieLimitReached;
-      if(Number(element.calorie)>=2.100)
-      {
-        calorieLimitReached=true;
-      }
-      else{
-        calorieLimitReached=false
-      }
-      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()].push({...element,calorieLimitReached:calorieLimitReached})
-      
-      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['monthlyExpenses']+=Number(element.price)
+  tempFood.forEach(element=>{
+    if(new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear() in detailsByMonths===false)
+    {
+      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]={days:{},monthlyExpenses:0,expenseLimitReached:false}
+    }
+    if(new Date(element.date).getDate() in detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()].days===false)
+    {
+      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()]={food:[],totalCalories:0,calorieLimitReached:false}
+    }
+    let calorieLimitReached;
+    
+    detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()].totalCalories+=Number(element.calorie);
 
-      if(detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['monthlyExpenses']>1.00)
-      {
-        detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['expenseLimitReached']=true
-      }
-    })
+    if(detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()].totalCalories>=2.10)
+    {
+
+      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()].calorieLimitReached=true;
+    }
+
+    detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()].food.push(element)
+    
+    detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['monthlyExpenses']+=Number(element.price)
+
+    if(detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['monthlyExpenses']>1.00)
+    {
+      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['expenseLimitReached']=true
+    }
+  })
     console.log(detailsByMonths)
     return detailsByMonths
 }
@@ -64,17 +66,19 @@ async  findById(userId:any): Promise<Food[]|any> {
     }
     if(new Date(element.date).getDate() in detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()].days===false)
     {
-      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()]=[]
+      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()]={food:[],totalCalories:0,calorieLimitReached:false}
     }
     let calorieLimitReached;
-    if(Number(element.calorie)>=2.100)
+    
+    detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()].totalCalories+=Number(element.calorie);
+
+    if(detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()].totalCalories>=2.10)
     {
-      calorieLimitReached=true;
+
+      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()].calorieLimitReached=true;
     }
-    else{
-      calorieLimitReached=false
-    }
-    detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()].push({...element,calorieLimitReached:calorieLimitReached})
+
+    detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()].food.push(element)
     
     detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['monthlyExpenses']+=Number(element.price)
 
@@ -100,13 +104,31 @@ async  findByDates(userRole:any,userId:any,dates:any): Promise<Food[]|any> {
     }
     if(new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear() in detailsByMonths===false)
     {
-      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]={}
+      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]={days:{},monthlyExpenses:0,expenseLimitReached:false}
     }
-    if(new Date(element.date).getDate() in detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]===false)
+    if(new Date(element.date).getDate() in detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()].days===false)
     {
-      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()][new Date(element.date).getDate()]=[]
+      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()]={food:[],totalCalories:0,calorieLimitReached:false}
     }
-    detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()][new Date(element.date).getDate()].push(element)
+    let calorieLimitReached;
+    
+    detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()].totalCalories+=Number(element.calorie);
+
+    if(detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()].totalCalories>=2.10)
+    {
+
+      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()].calorieLimitReached=true;
+    }
+
+    detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['days'][new Date(element.date).getDate()].food.push(element)
+    
+    detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['monthlyExpenses']+=Number(element.price)
+
+    if(detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['monthlyExpenses']>1.00)
+    {
+      detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]['expenseLimitReached']=true
+    }
+
   })
   console.log(detailsByMonths)
   return detailsByMonths

@@ -243,12 +243,12 @@ export class foodController {
 //         }
 //         return this.bikesService.update(bikesData,id);
 //     }
-    // @RoleGuard(ERole.M)
-    // @UseGuards(AuthGuard)
+    @RoleGuard(ERole.A)
+    @UseGuards(AuthGuard)
     @Delete(':id/delete')
     async delete(@Param('id') id): Promise<any> {
-     
+    
       return this.foodService.delete(id);
-    }  
+    }
 
 }
