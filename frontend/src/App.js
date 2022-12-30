@@ -18,7 +18,7 @@ function App() {
             <Route exact path='/' element={<Protected Element={<Home/>} />}></Route>
             <Route exact path='/allusers/:id' element={<Protected Element={<DetailsByUser/>} />}></Route>
 
-            <Route exact path='/allusers' element={<Protected Element={<AllUsers/>} />}></Route>
+            <Route exact path='/allusers' element={<Protected Element={<AllUsers/>}/>}></Route>
 
         </Routes>
       </Router>

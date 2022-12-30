@@ -23,7 +23,7 @@ export const AllUsers = ({state,fetchAllUsers}) => {
 
     {
       state.allUsers.map((value,key)=>(
-        <Card width='70%' m='auto' mt='10px' key={key} onClick={()=>navigate(`/allUsers/${value.id}`)}>
+        <Card width='70%' m='auto' mt='10px' key={key} onClick={()=>navigate(`/allusers/${value.id}`)}>
   <CardBody>
     <Flex>
     <Avatar bg='red.500'  />
