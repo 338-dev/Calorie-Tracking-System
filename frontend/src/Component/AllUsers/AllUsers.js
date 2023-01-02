@@ -11,7 +11,11 @@ export const AllUsers = ({state,fetchAllUsers}) => {
   const [cookies, setCookie] = useCookies(["user"]);
    const navigate=useNavigate()
   useEffect(() => {
+    console.log('ifuwh438w')
+
     fetchAllUsers(cookies)
+
+    console.log('2313qd2e')
   }, [])
   console.log(state.allUsers)
 

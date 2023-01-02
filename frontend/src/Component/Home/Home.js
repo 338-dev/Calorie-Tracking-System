@@ -10,6 +10,7 @@ import axios from 'axios'
 import { useCookies } from 'react-cookie'
 import { fetchFilteredFoodDetails, fetchFoodDetails, fetchUser } from '../../redux/action'
 import { useNavigate } from 'react-router-dom'
+import Pagination from '@mui/material/Pagination';
 
 export const Home = ({state,fetchFilteredFoodDetails}) => {
   const navigate=useNavigate();
@@ -17,6 +18,8 @@ export const Home = ({state,fetchFilteredFoodDetails}) => {
     startDate:'',
     endDate:''
   })
+  // const [page, setPage] = useState(1);
+
   const schema = Joi.object({
     startDate: Joi.date().max(DateFilter.endDate!==''?DateFilter.endDate:new Date()).required(),
     endDate: Joi.date().min(DateFilter.startDate!==''?DateFilter.startDate:new Date()).max(new Date()).required(),
@@ -24,6 +27,11 @@ export const Home = ({state,fetchFilteredFoodDetails}) => {
 
   const [cookies, setCookie] = useCookies(["user"]);
     const toast = useToast()
+    // const handleChange = (event, value) => {
+    //   setPage(value);
+    //   // setData(datas.slice(firstIndex + pageSize * (value - 1), pageSize * value));
+    // };
+  
   const saveDetails=()=>{
     console.log(DateFilter.startDate)
     const result = schema.validate(DateFilter);
@@ -91,6 +99,16 @@ else{
 </Center>
 <CreateModal/>
 <FoodList/>
+
+<Center>
+
+{/* <Pagination
+        count={2}
+        page={page}
+        onChange={handleChange}
+      /> */}
+</Center>
+
     </div>
   )
 }

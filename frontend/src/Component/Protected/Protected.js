@@ -47,7 +47,7 @@ export const Protected = ({state,Element,fetchUser}) => {
     </Center>
   ):(!state.userLoading && state.userError==="" && location.pathname==='/')?(
     <div>{Element}</div>
-  ):(state.user.role==="admin"&& (location.pathname==='/allusers' || ( id !==undefined && location.pathname===`/allusers/${id}`)))?(<div>{Element}</div>):(state.userError)?(<Navigate to='/login'/>):(
+  ):(state.user.role==="admin"&& (location.pathname==='/allusers' || ( id !==undefined && location.pathname===`/allusers/${id}`)||( id !==undefined && location.pathname===`/stats/${id}`)))?(<div>{Element}</div>):(state.userError)?(<Navigate to='/login'/>):(
   <Center>
     <Text fontSize="5xl" mt="70px" > Sorry, You cannot access this route!</Text>
   <Box>

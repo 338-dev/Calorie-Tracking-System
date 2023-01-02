@@ -7,6 +7,7 @@ import Home from './Component/Home/Home';
 import Protected from './Component/Protected/Protected';
 import AllUsers from './Component/AllUsers/AllUsers';
 import DetailsByUser from './Component/DetailsByUser/DetailsByUser';
+import Stats from './Component/Stats/Stats';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <Route exact path='/allusers/:id' element={<Protected Element={<DetailsByUser/>} />}></Route>
 
             <Route exact path='/allusers' element={<Protected Element={<AllUsers/>}/>}></Route>
+            <Route exact path='/stats/:id' element={<Protected Element={<Stats/>}/>}></Route>
 
         </Routes>
       </Router>

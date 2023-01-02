@@ -80,7 +80,7 @@ export const FoodList = ({state,fetchUser,fetchFoodDetails,fetchFoodDetailsByUse
     <WarningTwoIcon ml='5px'/>
   </Tooltip>}
       </Box>
-      <Grid templateColumns='repeat(3, 1fr)' gap={6} overflowX='auto' sx={{
+      <Grid templateColumns={`repeat(${state.foodDetails[value]['days'][val]['food'].length}, 1fr)`} gap={6} overflowX='auto' sx={{
     '&::-webkit-scrollbar': {
       width: '10px',
       borderRadius: '2px',
@@ -97,7 +97,7 @@ export const FoodList = ({state,fetchUser,fetchFoodDetails,fetchFoodDetailsByUse
       {
         Object.keys(state.foodDetails[value]['days'][val]['food']).map((vall,keee)=>(
             
-        <Card minW="230px" m="20px">
+        <Card minW="230px" maxW="300px" m="20px">
            {/* <IconButton
         variant='ghost'
         colorScheme='gray'

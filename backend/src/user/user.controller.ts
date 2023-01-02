@@ -199,16 +199,4 @@ export class UserController {
       };
 
      }
-    //  @UseGuards(AuthGuard)
-    //  @Post('logout')
-    // async logout(@Res({passthrough: true}) response: Response,@Req() request:Request) {
-    //   console.log(request)
-    //     response.clearCookie('jwt');
-
-    //     return {
-    //         message: 'cleared', 
-    //     }
-    // }
-
-
 }
