@@ -11,11 +11,13 @@ const initialState = {
     user:[],
     userError:'',
     totalPages:1,
-    currentBikePage:1,
+    currentFoodPage:1,
     isFilterSet:false,
     report:[],
     reportLoading:false,
-    reportError:''
+    reportError:'',
+    totalUsersPages:1,
+    currentUserPage:1
 }
 
 const reducer = (state = initialState, action) => {
@@ -25,11 +27,16 @@ const reducer = (state = initialState, action) => {
           ...state,
           loading: true
         }
-        case 'FETCH_PAGE_CHANGE_REQUEST':
+        case 'FETCH_FOOD_PAGE_CHANGE_REQUEST':
           return {
             ...state,
-            currentBikePage:action.payload
+            currentFoodPage:action.payload
           }
+          case 'FETCH_USER_PAGE_CHANGE_REQUEST':
+            return {
+              ...state,
+              currentUserPage:action.payload
+            }
       case 'FETCH_ALL_USERS_REQUEST':
         return {
           ...state,
@@ -40,6 +47,11 @@ const reducer = (state = initialState, action) => {
             ...state,
             totalPages:action.payload
           }
+          case 'FETCH_TOTAL_USERS_PAGES':
+            return {
+              ...state,
+              totalUsersPages:action.payload
+            }
         case 'FETCH_USER_REQUEST':
           return {
             ...state,
@@ -106,7 +118,7 @@ const reducer = (state = initialState, action) => {
             case 'FETCH_FILTER_IS_SET':
               return {
                 ...state,
-                isFilterSet:true
+                isFilterSet:action.payload
               }  
           case 'FETCH_ALL_USERS_FAILURE':
             return {

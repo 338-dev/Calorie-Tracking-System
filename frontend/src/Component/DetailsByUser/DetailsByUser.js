@@ -1,17 +1,25 @@
 import { Box, Center, Grid, Link } from '@chakra-ui/react'
+import { Pagination } from 'antd'
 import React, { useEffect } from 'react'
 import { useCookies } from 'react-cookie'
 import { connect } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
-import { fetchFoodDetails, fetchFoodDetailsByUsers, fetchUser } from '../../redux/action'
+import { fetchChangedFoodPage, fetchFoodDetails, fetchFoodDetailsByUsers, fetchUser } from '../../redux/action'
 import FoodList from '../FoodList/FoodList'
 import Navbar from '../Navbar/Navbar'
 
-export const DetailsByUser = ({state,fetchUser}) => {
+export const DetailsByUser = ({state,fetchUser,fetchChangedFoodPage}) => {
   const [cookies, setCookie] = useCookies(["user"]);
   const navigate=useNavigate();
   const {id}=useParams();
   
+  const handleChange = (e, p) => {
+    // setPage(p);
+    // if(!state.isFilterSet)
+      fetchFoodDetails(cookies,p)
+      fetchChangedFoodPage(p)
+    
+  }
   return (
     <div>
       <Navbar/>
@@ -36,6 +44,16 @@ export const DetailsByUser = ({state,fetchUser}) => {
         </Grid>
       </Box>}
       <FoodList/>
+      
+<Center m="10">
+
+<Pagination 
+  pageSize={5}
+  current={state.currentFoodPage}
+  total={state.totalPages}
+  onChange={handleChange}/>
+</Center>
+
     </div>
   )
 }
@@ -51,6 +69,7 @@ const mapDispatchToProps = dispatch => {
       fetchUser: (cookie) => dispatch(fetchUser(cookie)),
       fetchFoodDetails: (cookie) => dispatch(fetchFoodDetails(cookie)),
       fetchFoodDetailsByUsers: (cookie,id) => dispatch(fetchFoodDetailsByUsers(cookie,id)),
+      fetchChangedFoodPage: (page)=>dispatch(fetchChangedFoodPage(page)),
 
     }
 }

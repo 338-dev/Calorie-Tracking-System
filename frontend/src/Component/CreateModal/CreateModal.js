@@ -55,7 +55,7 @@ export const CreateModal = ({state,fetchFoodDetails}) => {
         isClosable: true,
       })  
       onClose()
-      fetchFoodDetails(cookies)
+      fetchFoodDetails(cookies,1)
       clearFoodDetails()
       console.log(data)
     })
@@ -108,7 +108,6 @@ export const CreateModal = ({state,fetchFoodDetails}) => {
       size="md"
       type="datetime-local"
       value={foodDetails.date} onChange={(e)=>setFoodDetails({...foodDetails,date:e.target.value})}
-      disableTimestampAfter={new Date()}
       />
     <FormLabel requiredIndicator={false}>Calorie value</FormLabel>
   <NumberInput precision={2} min={.01} step={0.01} value={foodDetails.calorie} onChange={(e)=>setFoodDetails({...foodDetails,calorie:e})} placeholder='Enter Calorie value' aria-required={false}>
@@ -142,7 +141,7 @@ export const CreateModal = ({state,fetchFoodDetails}) => {
   const mapDispatchToProps = dispatch => {
     return{
         fetchUser: (cookie) => dispatch(fetchUser(cookie)),
-        fetchFoodDetails: (cookie) => dispatch(fetchFoodDetails(cookie)),
+        fetchFoodDetails: (cookie,pg) => dispatch(fetchFoodDetails(cookie,pg)),
     }
   }
 

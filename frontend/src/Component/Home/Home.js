@@ -5,20 +5,24 @@ import CreateModal from '../CreateModal/CreateModal'
 import FoodList from '../FoodList/FoodList'
 import Navbar from '../Navbar/Navbar'
 import Joi from 'joi';
-import {SearchIcon} from '@chakra-ui/icons'
+import {CloseIcon, LinkIcon, SearchIcon} from '@chakra-ui/icons'
 import axios from 'axios'
 import { useCookies } from 'react-cookie'
-import { fetchFilteredFoodDetails, fetchFoodDetails, fetchUser } from '../../redux/action'
+import { fetchChangedFoodPage, fetchFilteredFoodDetails, fetchFilterIsSet, fetchFoodDetails, fetchUser } from '../../redux/action'
 import { useNavigate } from 'react-router-dom'
-import Pagination from '@mui/material/Pagination';
+// import { Pagination } from 'antd';
+import Pagination from "@mui/material/Pagination"
+import ReactPaginate from 'react-paginate'
+import InviteFriend from '../InviteFriend/InviteFriend'
 
-export const Home = ({state,fetchFilteredFoodDetails}) => {
+export const Home = ({state,fetchFilteredFoodDetails,fetchFoodDetails,fetchChangedFoodPage,fetchFilterIsSet}) => {
   const navigate=useNavigate();
   const [DateFilter, setDateFilter] = useState({
     startDate:'',
     endDate:''
   })
-  // const [page, setPage] = useState(1);
+
+  let [page, setPage] = useState(1);
 
   const schema = Joi.object({
     startDate: Joi.date().max(DateFilter.endDate!==''?DateFilter.endDate:new Date()).required(),
@@ -27,10 +31,20 @@ export const Home = ({state,fetchFilteredFoodDetails}) => {
 
   const [cookies, setCookie] = useCookies(["user"]);
     const toast = useToast()
-    // const handleChange = (event, value) => {
-    //   setPage(value);
-    //   // setData(datas.slice(firstIndex + pageSize * (value - 1), pageSize * value));
-    // };
+    const handleChange = (e, p) => {
+      setPage(p);
+      if(!state.isFilterSet){
+        fetchFoodDetails(cookies,p)
+        fetchChangedFoodPage(p)
+        console.log('p')
+        console.log(p)
+
+      }
+      else{
+        fetchFilteredFoodDetails(cookies,DateFilter,p)
+        fetchChangedFoodPage(p)
+      }
+    }
   
   const saveDetails=()=>{
     console.log(DateFilter.startDate)
@@ -42,16 +56,36 @@ const { error } = result;
 if (!error) {
 console.log('result');  
 
-    fetchFilteredFoodDetails(cookies,DateFilter)
+    fetchFilteredFoodDetails(cookies,DateFilter,1)
 }
 else{
   toast({
     title: error.message,
-    status: 'success',
+    status: 'error',
     duration: 2000,
     isClosable: true,
   })
 }
+}
+
+const clearFilter=()=>{
+  if(DateFilter.startDate==='' || DateFilter.endDate==='')
+  {
+    toast({
+      title: "set filter dates correctly",
+      status: 'error',
+      duration: 2000,
+      isClosable: true,
+    })
+    return
+  }
+  setDateFilter({
+    startDate:'',
+    endDate:''
+  })
+  fetchFoodDetails(cookies,1)
+  fetchFilterIsSet(false)
+
 }
 
   console.log(DateFilter)
@@ -73,8 +107,12 @@ else{
           </Center>
         </Grid>
       </Box>}
+      <Box mt="3">
+          <InviteFriend/>
+        </Box>
       <Center>
-      <Grid templateColumns='repeat(3, 1fr)' gap={6} mt='20px'>
+       
+      <Grid templateColumns='repeat(2, 1fr)' gap={6} mt='20px'>
   <GridItem w='100%' h='10'>
   <Input
       placeholder="Select Date and Time"
@@ -92,21 +130,34 @@ else{
       onChange={(e)=>{setDateFilter({...DateFilter,endDate:e.target.value})}}
       />
     </GridItem>
+    </Grid>  
+</Center>
+<Center mb="5">
+  <Grid templateColumns='repeat(2, 1fr)' gap={6} mt='20px'>
+  
     <Button width="10px" borderRadius="20px" onClick={saveDetails}>
     <SearchIcon/>
+    
     </Button>
-</Grid>     
+    <Button width="10px" borderRadius="20px" onClick={clearFilter}>
+    <CloseIcon/>
+    </Button>
+  </Grid>
 </Center>
 <CreateModal/>
 <FoodList/>
 
-<Center>
+<Center m="10">
 
-{/* <Pagination
-        count={2}
-        page={page}
-        onChange={handleChange}
-      /> */}
+<ReactPaginate  
+        breakLabel="..."  
+        nextLabel="next >"  
+        onPageChange={handleChange}  
+        Displayed Page Range = {5}  
+        pageCount={state.toalPages}  
+        previousLabel="< previous"  
+        renderOnZeroPageCount={null}  
+      />  
 </Center>
 
     </div>
@@ -124,8 +175,10 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = dispatch => {
   return{
       fetchUser: (cookie) => dispatch(fetchUser(cookie)),
-      fetchFoodDetails: (cookie) => dispatch(fetchFoodDetails(cookie)),
-      fetchFilteredFoodDetails: (cookie,filterDates) => dispatch(fetchFilteredFoodDetails(cookie,filterDates)),
+      fetchFoodDetails: (cookie,pg) => dispatch(fetchFoodDetails(cookie,pg)),
+      fetchFilteredFoodDetails: (cookie,filterDates,pg) => dispatch(fetchFilteredFoodDetails(cookie,filterDates,pg)),
+      fetchChangedFoodPage: (page)=>dispatch(fetchChangedFoodPage(page)),
+      fetchFilterIsSet: (event)=>dispatch(fetchFilterIsSet(event)),
 
   }
 }

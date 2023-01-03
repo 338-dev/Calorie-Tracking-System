@@ -1,4 +1,13 @@
-import { Box, Card, CardBody, Center, Divider, Editable, EditableInput, EditablePreview, Flex, Grid, GridItem, IconButton, Menu, MenuButton, MenuItem, MenuList, Spacer, Text, Tooltip, useToast } from '@chakra-ui/react';
+import { Box, Button, Card, CardBody, Center, Divider, Editable, EditableInput, EditablePreview, Flex, Grid, GridItem, IconButton, Menu, MenuButton, MenuItem, MenuList, Spacer, Text, Tooltip, useDisclosure, useToast } from '@chakra-ui/react';
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+} from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useCookies } from 'react-cookie';
 import { connect } from 'react-redux'
@@ -8,17 +17,25 @@ import money from '../../Images/money.png'
 import { ChevronDownIcon, WarningIcon, WarningTwoIcon} from '@chakra-ui/icons';
 import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
 import axios from 'axios';
+import EditModal from '../EditModal/EditModal';
 
 export const FoodList = ({state,fetchUser,fetchFoodDetails,fetchFoodDetailsByUsers}) => {
   const [cookies, setCookie] = useCookies(["user"]);
   const toast = useToast()
 
   const [isEditSet, setIsEditSet] = useState({status:false,month:'',date:'',key:''})
+
+  const [editDetails, setEditDetails] = useState({
+    name:"",
+    price:"",
+    calorie:""
+  })
+
   useEffect(() => {
     if(window.location.pathname==='/')
-      fetchFoodDetails(cookies)
+      fetchFoodDetails(cookies,1)
     else{
-      fetchFoodDetailsByUsers(cookies,window.location.pathname.split('/')[2])
+      fetchFoodDetailsByUsers(cookies,window.location.pathname.split('/')[2],1)
     console.log('23')}
     console.log('23')
 
@@ -46,7 +63,10 @@ export const FoodList = ({state,fetchUser,fetchFoodDetails,fetchFoodDetailsByUse
             console.log(error)
         })
   }
-  console.log(state)
+  // console.log(state)
+
+  const { isOpen, onOpen, onClose } = useDisclosure()
+
   
   return(Object.keys(state.foodDetails).length===0 && !state.isFilterSet)?(
     <Center mt='100px'>
@@ -75,11 +95,13 @@ export const FoodList = ({state,fetchUser,fetchFoodDetails,fetchFoodDetailsByUse
   {
     Object.keys(state.foodDetails[value].days).map((val,kee)=>(<>
       <Box ml="30px">{val+" "+value.split(' ').splice(0,1).join(' ')}
-      {console.log(state.foodDetails[value]['days'][val].calorieLimitReached )}
+      {/* {console.log(state.foodDetails[value]['days'][val].calorieLimitReached )} */}
+
       {state.foodDetails[value]['days'][val].calorieLimitReached &&<Tooltip label={<Box><Center fontSize="2xl">Warning!</Center><Text>Daily calorie limit reached </Text></Box>} fontSize='md'>
     <WarningTwoIcon ml='5px'/>
   </Tooltip>}
       </Box>
+
       <Grid templateColumns={`repeat(${state.foodDetails[value]['days'][val]['food'].length}, 1fr)`} gap={6} overflowX='auto' sx={{
     '&::-webkit-scrollbar': {
       width: '10px',
@@ -105,19 +127,23 @@ export const FoodList = ({state,fetchUser,fetchFoodDetails,fetchFoodDetailsByUse
         icon={<MoreVertOutlinedIcon />}/> */}
   <CardBody>
     <Flex>
-    {(!isEditSet.status || isEditSet.key!==keee || isEditSet.month!==value || isEditSet.date!==val) &&<Text fontSize='2xl'>{state.foodDetails[value]['days'][val]['food'][vall].name}</Text>}
-    {isEditSet.status && isEditSet.key===keee && isEditSet.month===value && isEditSet.date===val &&<Editable defaultValue={state.foodDetails[value]['days'][val]['food'][vall].name}>
+    <Text fontSize='2xl'>{state.foodDetails[value]['days'][val]['food'][vall].name}</Text>
+    {/* {isEditSet.status && isEditSet.key===keee && isEditSet.month===value && isEditSet.date===val &&<Editable defaultValue={state.foodDetails[value]['days'][val]['food'][vall].name}>
   <EditablePreview />
   <EditableInput />
-</Editable>}
+</Editable>} */}
     <Spacer/>
     <Flex>
     {state.foodDetails[value]['days'][val]['food'][vall].calorie&&<><img src={calories} alt="calories" width='40px'/>
-    {(!isEditSet.status || isEditSet.key!==keee || isEditSet.month!==value || isEditSet.date!==val) &&<Text mt='10px'>{state.foodDetails[value]['days'][val]['food'][vall].calorie}</Text>}
-    {isEditSet.status && isEditSet.key===keee && isEditSet.month===value && isEditSet.date===val &&<Editable defaultValue={state.foodDetails[value]['days'][val]['food'][vall].calorie}>
+    <Text mt='10px'>{state.foodDetails[value]['days'][val]['food'][vall].calorie}</Text>
+    {/* {isEditSet.status && isEditSet.key===keee && isEditSet.month===value && isEditSet.date===val &&<Editable defaultValue={state.foodDetails[value]['days'][val]['food'][vall].calorie}>
   <EditablePreview />
-  <EditableInput />
-</Editable>}</>}
+  <EditableInput /> 
+</Editable>}*/}
+
+</>}
+
+
     {window.location.pathname!=="/"&&<Box position='absolute' top='1' right='-6' ml='20px'>
     <Menu>
   <MenuButton
@@ -140,7 +166,7 @@ export const FoodList = ({state,fetchUser,fetchFoodDetails,fetchFoodDetailsByUse
         icon={<MoreVertOutlinedIcon/>}/>
   </MenuButton>
   <MenuList>
-    <MenuItem onClick={()=>setIsEditSet({status:true,month:value,date:val,key:keee})}>Edit</MenuItem>
+    <MenuItem onClick={()=>setEditDetails({...state.foodDetails[value]['days'][val]['food'][vall]})}><EditModal detail={editDetails}/></MenuItem>
     <MenuItem onClick={()=>deleteEntry(state.foodDetails[value]['days'][val]['food'][vall].id)}>Delete</MenuItem>
   </MenuList>
 </Menu>
@@ -187,8 +213,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = dispatch => {
   return{
       fetchUser: (cookie) => dispatch(fetchUser(cookie)),
-      fetchFoodDetails: (cookie) => dispatch(fetchFoodDetails(cookie)),
-      fetchFoodDetailsByUsers: (cookie,id) => dispatch(fetchFoodDetailsByUsers(cookie,id)),
+      fetchFoodDetails: (cookie,pg) => dispatch(fetchFoodDetails(cookie,pg)),
+      fetchFoodDetailsByUsers: (cookie,id,pg) => dispatch(fetchFoodDetailsByUsers(cookie,id,pg)),
 
     }
 }

@@ -3,20 +3,27 @@ import React, { useEffect } from 'react'
 import { useCookies } from 'react-cookie'
 import { connect } from 'react-redux'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { fetchAllUsers, fetchFoodDetails, fetchUser } from '../../redux/action'
+import { fetchAllUsers, fetchChangedUserPage, fetchFoodDetails, fetchUser } from '../../redux/action'
 import Navbar from '../Navbar/Navbar'
 import {ChevronRightIcon, EmailIcon} from '@chakra-ui/icons'
+import { Pagination } from 'antd'
 
-export const AllUsers = ({state,fetchAllUsers}) => {
+export const AllUsers = ({state,fetchAllUsers,fetchChangedUserPage}) => {
   const [cookies, setCookie] = useCookies(["user"]);
    const navigate=useNavigate()
   useEffect(() => {
     console.log('ifuwh438w')
 
-    fetchAllUsers(cookies)
+    fetchAllUsers(cookies,1)
 
     console.log('2313qd2e')
   }, [])
+
+  const handleChange = (e, p) => {
+    // setPage(p);
+    fetchAllUsers(cookies,p)
+    fetchChangedUserPage(p)
+  }
   console.log(state.allUsers)
 
   return(state.loading)?(<Center verticalAlign='middle'>
@@ -42,6 +49,17 @@ export const AllUsers = ({state,fetchAllUsers}) => {
 </Card>
       ))
     }
+
+    
+<Center mt="10">
+
+<Pagination 
+  pageSize={5}
+  current={state.currentUserPage}
+  total={state.totalUsersPages}
+  onChange={handleChange}/>
+</Center>
+
     </>)
 }
 
@@ -53,8 +71,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = dispatch => {
   return{
+    fetchChangedUserPage: (page)=>dispatch(fetchChangedUserPage(page)),
       fetchUser: (cookie) => dispatch(fetchUser(cookie)),
-      fetchAllUsers: (cookie) => dispatch(fetchAllUsers(cookie)),
+      fetchAllUsers: (cookie,pg) => dispatch(fetchAllUsers(cookie,pg)),
       fetchFoodDetails: (cookie) => dispatch(fetchFoodDetails(cookie)),
   }
 }
