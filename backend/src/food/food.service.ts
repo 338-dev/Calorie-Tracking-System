@@ -56,10 +56,15 @@ async  findAll(userRole:any,userId:any,pg:any): Promise<Food[]|any> {
         }
       })
 
+      const totalPages=Math.ceil(new_arr.length/5);
+// console.log()
+
     console.log(tempFood)
 
     console.log('tempFood')
     const detailsByMonths={}
+
+
   tempFood.forEach(element=>{
     if(new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear() in detailsByMonths===false)
     {
@@ -94,7 +99,7 @@ async  findAll(userRole:any,userId:any,pg:any): Promise<Food[]|any> {
     //   detailsByMonths.element.days
     // });
     
-    return detailsByMonths
+    return [detailsByMonths,totalPages]
 }
 
 async  findById(userId:any,pg:any): Promise<Food[]|any> {
@@ -135,6 +140,8 @@ async  findById(userId:any,pg:any): Promise<Food[]|any> {
       }
     })
 
+    const totalPages=Math.ceil(new_arr.length/5);
+
 
   console.log('tempFood')
   const detailsByMonths={}
@@ -167,7 +174,7 @@ async  findById(userId:any,pg:any): Promise<Food[]|any> {
     }
   })
   console.log(detailsByMonths)
-  return detailsByMonths
+  return [detailsByMonths,totalPages] 
 }
 
 async  findReportById(userId:any): Promise<Food[]|any> {
@@ -200,7 +207,7 @@ async  findReportById(userId:any): Promise<Food[]|any> {
     }
   })
 
-  return {pastWeekEntry:pastWeekEntry, pastPastWeekEntry:pastPastWeekEntry,avgCalories:avgCalories/pastWeekEntry.length}
+  return {pastWeekEntry:pastWeekEntry, pastPastWeekEntry:pastPastWeekEntry,avgCalories:(avgCalories/pastWeekEntry.length).toFixed(2)}
 //   let pastWeekEntry
 
 //   const dateLastWeek = new Date();
@@ -226,8 +233,19 @@ async  findByDates(userRole:any,userId:any,dates:any,pg:any): Promise<Food[]|any
     console.log(sortedProducts)
 
     const set=new Set()
+    const firstFilter=[]
+
 
     sortedProducts.forEach((element)=>{
+      if(new Date(element.date).getTime()<new Date(dates.startDate).getTime()-(3600*5+1800)*1000 || new Date(element.date).getTime()>new Date(dates.endDate).getTime()-(3600*5+1800)*1000+((3600*24)*1000))
+    {
+      return;
+    }
+
+    firstFilter.push(element)
+    })
+
+    firstFilter.forEach((element)=>{
       set.add(new Date(new Date(element.date).toDateString()).getTime());
     })
 
@@ -238,7 +256,7 @@ async  findByDates(userRole:any,userId:any,dates:any,pg:any): Promise<Food[]|any
     console.log(new_arr)
     console.log('new_arr')
 
-    sortedProducts.forEach((element)=>{
+    firstFilter.forEach((element)=>{
       if(new_arr.length<5*pg)
       {
         if(new Date(new Date(element.date).toDateString()).getTime()<=Number(new_arr[5*(pg-1)]) && new Date(new Date(element.date).toDateString()).getTime()>=Number(new_arr[new_arr.length-1]))
@@ -254,15 +272,12 @@ async  findByDates(userRole:any,userId:any,dates:any,pg:any): Promise<Food[]|any
         }
       }
     })
+    const totalPages=Math.ceil(new_arr.length/5);
 
   console.log('tempFood')
   const detailsByMonths={}
   tempFood.forEach(element=>{
 
-    if(new Date(element.date).getTime()<new Date(dates.startDate).getTime()-(3600*5+1800)*1000 || new Date(element.date).getTime()>new Date(dates.endDate).getTime()-(3600*5+1800)*1000+((3600*24)*1000))
-    {
-      return;
-    }
     if(new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear() in detailsByMonths===false)
     {
       detailsByMonths[new Date(element.date).toLocaleString('default', { month: 'long' })+" "+new Date(element.date).getFullYear()]={days:{},monthlyExpenses:0,expenseLimitReached:false}
@@ -292,7 +307,7 @@ async  findByDates(userRole:any,userId:any,dates:any,pg:any): Promise<Food[]|any
 
   })
   console.log(detailsByMonths)
-  return detailsByMonths
+  return [detailsByMonths,totalPages]
 }
 
 async  create(food: Food): Promise<any> {    
@@ -300,20 +315,20 @@ async  create(food: Food): Promise<any> {
     return await this.foodRepository.save(food);
 }
 
-async update(bike: Food,id:any): Promise<UpdateResult> {
+async update(foodDetails: Food,id:any): Promise<UpdateResult> {
 
-  const bike1:any = await this.foodRepository.findOne({where:{id}});
+  const food:any = await this.foodRepository.findOne({where:{id}});
 
   console.log('bike')
 
-  console.log(bike1)
+  console.log(food)
 
-  if(bike1===null)
+  if(food===null)
   {
-    console.log(bike1)
-    throw new BadRequestException("Bike doesn't  exist")
+    console.log(food)
+    throw new BadRequestException("food detail doesn't  exist")
   }
-    return await this.foodRepository.update(bike.id, bike);
+    return await this.foodRepository.update(id, foodDetails);
 }
 
 

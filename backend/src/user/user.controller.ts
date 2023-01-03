@@ -37,9 +37,9 @@ export class UserController {
   
   @RoleGuard(ERole.A)
   @UseGuards(AuthGuard)
-  @Get()
-  index(): Promise<User[]> {
-    return this.userService.findAll();
+  @Get('pg/:pg')
+  index(@Param('pg') pg): Promise<User[]> {
+    return this.userService.findAll(pg);
   }  
 
  

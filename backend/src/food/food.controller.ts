@@ -23,6 +23,12 @@ const schema = Joi.object({
   price:Joi.number().min(.02).max(10).required(),
 });
 
+const schemaUpdate = Joi.object({
+  name: Joi.string().trim().min(3).max(30),
+  calorie:Joi.number().min(.01).max(100).allow('').optional(),
+  price:Joi.number().min(.02).max(10),
+});
+
 const schemaDates = Joi.object({
   startDate: Joi.date().max(new Date()).required(),
   endDate: Joi.date().max(new Date()).required(),
@@ -41,6 +47,8 @@ export class foodController {
       const user = await User.findOne({where: {id}});
     return this.foodService.findAll(user.role,id,pg);
   }  
+
+  
   @RoleGuard(ERole.A)
   @UseGuards(AuthGuard)
   @Get('/:id/pg/:pg')
@@ -87,6 +95,30 @@ export class foodController {
       const user = await User.findOne({where: {id}});
     return this.foodService.findByDates(user.role,id,dates,pg);
   }  
+
+  @RoleGuard(ERole.A)
+  @UseGuards(AuthGuard)
+  @Put(':id/update')
+  async updateDetails(@Param('id') id, @Body() foodData: Food,@Headers() headers): Promise<any> {
+    const token = headers.jwt;
+    const decoded:any = jwt.verify(token,'secret');
+    const userId = decoded.id;
+
+    // if(foodData.e)
+
+    const result = schemaUpdate.validate(foodData);
+    foodData={...foodData,name:foodData.name.trim()}
+
+    console.log(foodData)
+    const { error } = result;
+    if(error)
+    {
+      throw new BadRequestException(result.error.message)
+    }
+
+      return this.foodService.update(foodData,id);
+  }
+
   // @RoleGuard(ERole.M)
   @UseGuards(AuthGuard)
   @Post('create')

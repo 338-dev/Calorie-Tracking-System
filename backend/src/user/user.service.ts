@@ -19,8 +19,10 @@ export class UserService {
 
 
 
-async  findAll(): Promise<User[]> {
-    return await this.userRepository.find();
+async  findAll(pg:any): Promise<any> {
+    const users=await this.userRepository.find();
+
+    return [users.splice((pg-1)*7,pg*7-1),Math.ceil(users.length/7)]
 }
 
 async  find(id: any): Promise<User[] | User | string> {
