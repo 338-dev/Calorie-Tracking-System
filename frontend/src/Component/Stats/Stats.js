@@ -77,7 +77,7 @@ Last week Entries
   }}>
       {
         state.report.pastWeekEntry.map((val,key)=>(
-          <Box>
+          <Box key={key}>
         <Card minW="230px" m="20px">
   <CardBody>
     <Flex>
@@ -117,7 +117,7 @@ Past Last week Entries
   }}>
       {
         state.report.pastPastWeekEntry.map((val,key)=>(
-          <Box>
+          <Box key={key}>
         <Card minW="230px" m="20px">
   <CardBody>
     <Flex>

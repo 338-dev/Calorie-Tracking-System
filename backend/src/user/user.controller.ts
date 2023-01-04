@@ -31,6 +31,16 @@ const schemaRegister = Joi.object({
 
 });
 
+const schemaCreateId = Joi.object({
+  email: Joi.string().trim().email({ tlds: { allow: false } }).required(),
+  name: Joi.string().trim().min(2).max(30).required(),
+});
+
+const tempSchema = Joi.object({
+  email: Joi.string().trim().email({ tlds: { allow: false } }).required(),
+  password: Joi.string().min(8).max(30).required()})
+
+
 @Controller('/user')
 export class UserController {
   constructor(private readonly userService: UserService, private jwtService: JwtService) {}
@@ -39,6 +49,10 @@ export class UserController {
   @UseGuards(AuthGuard)
   @Get('pg/:pg')
   index(@Param('pg') pg): Promise<User[]> {
+    if(Number(pg)<1)
+    {
+      throw new BadRequestException("page number cannot be less than 1");
+    }
     return this.userService.findAll(pg);
   }  
 
@@ -69,6 +83,10 @@ export class UserController {
   @UseGuards(AuthGuard)
   @Get(':id')
   indexUser(@Param('id') id): Promise<User[] | string | User> {
+    if(Number(id)<1)
+    {
+      throw new BadRequestException("page number cannot be less than 1");
+    }
     return this.userService.find(id);
   } 
 
@@ -87,18 +105,16 @@ export class UserController {
       }
 
       const hashedPassword= await bcrypt.hash(password,12)
-      return this.userService.create({...userData, password:hashedPassword,name:userData.name.trim(),email:userData.email.trim().toLowerCase(),role:'regular'});
+      return this.userService.create({password:hashedPassword,name:userData.name.trim(),email:userData.email.trim().toLowerCase(),role:'regular'});
     }
 
-    @RoleGuard(ERole.A)
-    @UseGuards(AuthGuard)
-    @Post('create')
-    async create(@Body() userData: User): Promise<any> {
-      const {name,email,password,role} =userData;
+    @Post('inviteFriend')
+    async invite(@Body() userData: User,@Headers() header): Promise<any> {
+      const {name,email} =userData;
 
       
       
-      const result = schema.validate({name:name,email:email,password:password,role:role});
+      const result = schemaCreateId.validate({name:name,email:email});
 
       const { error } = result;
       if(error)
@@ -106,78 +122,31 @@ export class UserController {
         throw new BadRequestException(result.error.message)
       }
 
-      const hashedPassword= await bcrypt.hash(password,12)
-      return this.userService.create({...userData, password:hashedPassword,name:userData.name.trim(),email:userData.email.trim().toLowerCase()});
+      const createdPassword=Math.random().toString(36).slice(2, 10)
+
+
+      const hashedPassword= await bcrypt.hash(createdPassword,12)
+
+      // console.log(header.origin)
+      return this.userService.createFriend({password:hashedPassword,name:userData.name.trim(),email:userData.email.trim().toLowerCase(),role:'regular'},header.origin,createdPassword);
     }
+
     
-    @RoleGuard(ERole.A)
-    @UseGuards(AuthGuard)
-    @Put(':id/update')
-    async update(@Param('id') id, @Body() userData: User): Promise<any> {
-        userData.id = Number(id);
-        console.log('Update #' + userData.id)
-        
-        
-      if(userData.name!==undefined)
-      {
-        const tempSchema=Joi.object({
-          name:Joi.string().trim().min(1).required()
-        });
-        const result = tempSchema.validate({name:userData.name})
-
-        const { error } = result;
-        if(error)
-        {
-          throw new BadRequestException(result.error.message) 
-        }
-
-      }
-      if(userData.email!==undefined)
-      {
-        const tempSchema=Joi.object({
-          email: Joi.string().email({ tlds: { allow: false } }).required(),
-        });
-        const result = tempSchema.validate({email:userData.email})
-
-        const { error } = result;
-        if(error)
-        {
-          throw new BadRequestException(result.error.message)
-        }
-      }
-      if(userData.role!==undefined)
-      {
-        const tempSchema=Joi.object({
-          role:Joi.string().valid('regular').valid('manager').required(),
-        });
-        const result = tempSchema.validate({role:userData.role})
-
-        const { error } = result;
-        if(error)
-        {
-          throw new BadRequestException(result.error.message)
-        }
-      }
-
-        return this.userService.update(userData);
-    }
     
-    @RoleGuard(ERole.A)
-    @UseGuards(AuthGuard)
-    @Delete(':id/delete')
-    async delete(@Param('id') id): Promise<any> {
-      return this.userService.delete(id);
-    }  
+    
+    // @RoleGuard(ERole.A)
+    // @UseGuards(AuthGuard)
+    // @Delete(':id/delete')
+    // async delete(@Param('id') id): Promise<any> {
+    //   return this.userService.delete(id);
+    // }  
 
     @Post('login')
     async userLogin(@Body() {email, password}:{email:string; password:string},
     @Res({passthrough:true}) response:Response)
     {
       const tempEmail=email.trim().toLowerCase();
-      const tempSchema = Joi.object({
-        email: Joi.string().trim().email({ tlds: { allow: false } }).required(),
-        password: Joi.string().min(8).max(30).required()})
-
+      
       const result = tempSchema.validate({email:tempEmail,password:password})
 
         const user=await  this.userService.userLogin({tempEmail});

@@ -41,6 +41,15 @@ export class foodController {
   @UseGuards(AuthGuard)
   @Get('pg/:pg')
   async index(@Auth() auth,@Headers() headers,@Param('pg') pg): Promise<[]> {
+
+    if(Number(pg)<1)
+    {
+      throw new BadRequestException("Page cannot be negative")
+    }
+    else if(isNaN(pg))
+    {
+      throw new BadRequestException("Page value should be a number")
+    }
     const token = headers.jwt;
       const decoded:any = jwt.verify(token,'secret');
       const id = decoded.id;
@@ -48,16 +57,20 @@ export class foodController {
     return this.foodService.findAll(user.role,id,pg);
   }  
 
-  
+
   @RoleGuard(ERole.A)
   @UseGuards(AuthGuard)
   @Get('/:id/pg/:pg')
   async foodByUser(@Auth() auth,@Param('id') id,@Param('pg') pg,@Headers() headers): Promise<[]> {
-    const token = headers.jwt;
-    console.log(id)
-      // const decoded:any = jwt.verify(token,'secret');
-      // const id = decoded.id;
-      // const user = await User.findOne({where: {id}});
+
+    if(Number(pg)<1 || Number(id)<1)
+    {
+      throw new BadRequestException("Page or Id cannot be negative")
+    }
+    else if(isNaN(pg) || isNaN(id))
+    {
+      throw new BadRequestException("Page or Id value should be a number")
+    }
     return this.foodService.findById(id,pg);
   }  
 
@@ -65,17 +78,30 @@ export class foodController {
   @UseGuards(AuthGuard)
   @Get('stats/:id')
   async reportByUser(@Auth() auth,@Param('id') id,@Headers() headers): Promise<[]> {
-    const token = headers.jwt;
-    console.log(id)
-      // const decoded:any = jwt.verify(token,'secret');
-      // const id = decoded.id;
-      // const user = await User.findOne({where: {id}});
+
+    if(Number(id)<1)
+    {
+      throw new BadRequestException("Page cannot be negative")
+    }
+    else if(isNaN(id))
+    {
+      throw new BadRequestException("Page value should be a number")
+    }
+
     return this.foodService.findReportById(id);
   }  
 
   @UseGuards(AuthGuard)
   @Post('/filtered/pg/:pg')
   async filter(@Auth() auth,@Headers() headers,@Body() dates,@Param('pg') pg): Promise<[]> {
+    if(Number(pg)<1)
+    {
+      throw new BadRequestException("Page cannot be negative")
+    }
+    else if(isNaN(pg))
+    {
+      throw new BadRequestException("Page value should be a number")
+    }
     const token = headers.jwt;
       const decoded:any = jwt.verify(token,'secret');
       const id = decoded.id;
@@ -100,9 +126,18 @@ export class foodController {
   @UseGuards(AuthGuard)
   @Put(':id/update')
   async updateDetails(@Param('id') id, @Body() foodData: Food,@Headers() headers): Promise<any> {
-    const token = headers.jwt;
-    const decoded:any = jwt.verify(token,'secret');
-    const userId = decoded.id;
+
+    if(Number(id)<1)
+    {
+      throw new BadRequestException("Page cannot be negative")
+    }
+    else if(isNaN(id))
+    {
+      throw new BadRequestException("Page value should be a number")
+    }
+    // const token = headers.jwt;
+    // const decoded:any = jwt.verify(token,'secret');
+    // const userId = decoded.id;
 
     // if(foodData.e)
 
@@ -119,7 +154,6 @@ export class foodController {
       return this.foodService.update(foodData,id);
   }
 
-  // @RoleGuard(ERole.M)
   @UseGuards(AuthGuard)
   @Post('create')
     async create(@Body() foodData: Food,@Headers() headers): Promise<any> {

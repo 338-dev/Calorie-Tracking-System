@@ -50,7 +50,7 @@ export const FoodList = ({state,fetchUser,fetchFoodDetails,fetchFoodDetailsByUse
             })
         .then((data)=>{
             console.log(data.data)
-            fetchFoodDetailsByUsers(cookies,window.location.pathname.split('/')[2])
+            fetchFoodDetailsByUsers(cookies,window.location.pathname.split('/')[2],1)
             toast({
               title: 'Success',
               description: "Item deleted successfully",
@@ -79,7 +79,7 @@ export const FoodList = ({state,fetchUser,fetchFoodDetails,fetchFoodDetailsByUse
   ):(
     <Box mt="20px">
     {
-      Object.keys(state.foodDetails).map((value,key)=>(<>
+      Object.keys(state.foodDetails).map((value,key)=>(<div key={key}>
         <Divider/>
         <Flex>
         <Text padding="2"  >{value}</Text>
@@ -93,7 +93,7 @@ export const FoodList = ({state,fetchUser,fetchFoodDetails,fetchFoodDetailsByUse
   <Divider />
 
   {
-    Object.keys(state.foodDetails[value].days).map((val,kee)=>(<>
+    Object.keys(state.foodDetails[value].days).map((val,kee)=>(<div key={kee}>
       <Box ml="30px">{val+" "+value.split(' ').splice(0,1).join(' ')}
       {/* {console.log(state.foodDetails[value]['days'][val].calorieLimitReached )} */}
 
@@ -119,7 +119,7 @@ export const FoodList = ({state,fetchUser,fetchFoodDetails,fetchFoodDetailsByUse
       {
         Object.keys(state.foodDetails[value]['days'][val]['food']).map((vall,keee)=>(
             
-        <Card minW="230px" maxW="300px" m="20px">
+        <Card minW="230px" maxW="300px" m="20px" key={keee}>
            {/* <IconButton
         variant='ghost'
         colorScheme='gray'
@@ -194,11 +194,11 @@ export const FoodList = ({state,fetchUser,fetchFoodDetails,fetchFoodDetailsByUse
     }
 {/* <Divider orientation='vertical' /> */}
 </Grid>        
-</>
+</div>
     ))
   }
   
-        </>))
+        </div>))
     }
     </Box>
   )

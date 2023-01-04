@@ -22,7 +22,9 @@ export class UserService {
 async  findAll(pg:any): Promise<any> {
     const users=await this.userRepository.find();
 
-    return [users.splice((pg-1)*7,pg*7-1),Math.ceil(users.length/7)]
+    const totalPages=Math.ceil(users.length/6);
+
+    return [users.splice((pg-1)*6,6),totalPages]
 }
 
 async  find(id: any): Promise<User[] | User | string> {
@@ -52,25 +54,40 @@ async  create(user: User | any): Promise<User> {
     return await this.userRepository.save(user);
 }
 
-
-async update(user: User): Promise<UpdateResult>{
-  if(user.email!==undefined)
+async  createFriend(user: User | any,url,password): Promise<any> {
+  
+  const allUser= await this.userRepository.find();
+  for(const iter of allUser)
   {
-    const allUser= await this.userRepository.find();
-    for(const iter of allUser)
-    {
-        if(iter.email===user.email)
-        { 
-            throw new HttpException('Email already exists, try something different',400) 
-        }
-    }
+      if(iter.email===user.email)
+      { 
+          throw new HttpException('Email already exists, try something different',400) 
+      }
   }
-    return await this.userRepository.update(user.id, user);
+  // console.log(url+"/inviteFriend/email:"+user.email+"|"+"password:"+password)
+  const res=await this.userRepository.save(user);
+
+  return {res:res,link:url+"/inviteFriend/email:"+user.email+"-"+"password:"+password}
 }
 
-async delete(id: string | number| FindOptionsWhere<User>): Promise<DeleteResult> {
-    return await this.userRepository.delete(id);
-}
+// async update(user: User): Promise<UpdateResult>{
+//   if(user.email!==undefined)
+//   {
+//     const allUser= await this.userRepository.find();
+//     for(const iter of allUser)
+//     {
+//         if(iter.email===user.email)
+//         { 
+//             throw new HttpException('Email already exists, try something different',400) 
+//         }
+//     }
+//   }
+//     return await this.userRepository.update(user.id, user);
+// }
+
+// async delete(id: string | number| FindOptionsWhere<User>): Promise<DeleteResult> {
+//     return await this.userRepository.delete(id);
+// }
  
 async userLogin({ tempEmail}:{ tempEmail: string;}):Promise<User> {
   const user= await this.userRepository.findOne({where: {email:tempEmail}});

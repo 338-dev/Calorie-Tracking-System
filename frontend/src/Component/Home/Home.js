@@ -1,4 +1,4 @@
- import { Box, Button, Center, Grid, GridItem, Input, Link, useToast } from '@chakra-ui/react'
+ import { Box, Center,Button, Grid, GridItem, Input, Link, useToast } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import CreateModal from '../CreateModal/CreateModal'
@@ -11,9 +11,11 @@ import { useCookies } from 'react-cookie'
 import { fetchChangedFoodPage, fetchFilteredFoodDetails, fetchFilterIsSet, fetchFoodDetails, fetchUser } from '../../redux/action'
 import { useNavigate } from 'react-router-dom'
 // import { Pagination } from 'antd';
-import Pagination from "@mui/material/Pagination"
+// import Pagination from "@mui/material/Pagination"
 import ReactPaginate from 'react-paginate'
 import InviteFriend from '../InviteFriend/InviteFriend'
+// import {Button} from '@mui/material';
+
 
 export const Home = ({state,fetchFilteredFoodDetails,fetchFoodDetails,fetchChangedFoodPage,fetchFilterIsSet}) => {
   const navigate=useNavigate();
@@ -31,7 +33,13 @@ export const Home = ({state,fetchFilteredFoodDetails,fetchFoodDetails,fetchChang
 
   const [cookies, setCookie] = useCookies(["user"]);
     const toast = useToast()
-    const handleChange = (e, p) => {
+    const handleChange = (p) => {
+      console.log(p)
+      console.log(state)
+      if(p<1 || p>state.totalPages)
+      {
+        return
+      }
       setPage(p);
       if(!state.isFilterSet){
         fetchFoodDetails(cookies,p)
@@ -57,6 +65,12 @@ if (!error) {
 console.log('result');  
 
     fetchFilteredFoodDetails(cookies,DateFilter,1)
+    toast({
+      title: "Showing filtered items",
+      status: 'success',
+      duration: 2000,
+      isClosable: true,
+    })
 }
 else{
   toast({
@@ -72,7 +86,7 @@ const clearFilter=()=>{
   if(DateFilter.startDate==='' || DateFilter.endDate==='')
   {
     toast({
-      title: "set filter dates correctly",
+      title: "Filter already cleared",
       status: 'error',
       duration: 2000,
       isClosable: true,
@@ -107,7 +121,7 @@ const clearFilter=()=>{
           </Center>
         </Grid>
       </Box>}
-      <Box mt="3">
+      <Box mt="3" ml="3">
           <InviteFriend/>
         </Box>
       <Center>
@@ -149,15 +163,17 @@ const clearFilter=()=>{
 
 <Center m="10">
 
-<ReactPaginate  
-        breakLabel="..."  
-        nextLabel="next >"  
-        onPageChange={handleChange}  
-        Displayed Page Range = {5}  
-        pageCount={state.toalPages}  
-        previousLabel="< previous"  
-        renderOnZeroPageCount={null}  
-      />  
+<nav aria-label="Page navigation example">
+  <ul className="pagination">
+  <li className="page-item" onClick={()=>handleChange(page-1)}><a className="page-link" style={{'cursor':'pointer'}}>Previous</a></li>
+    {
+      Array.from({length: state.totalPages}, (_, i) => i + 1).map((value,key)=>(
+        <li className="page-item" key={key} onClick={()=>{handleChange(value)}}><a className="page-link" style={{'cursor':'pointer'}}>{value}</a></li>
+      ))
+    }
+    <li className="page-item" style={{'cursor':'pointer'}} onClick={()=>handleChange(page+1)}><a className="page-link">Next</a></li>
+  </ul>
+</nav>
 </Center>
 
     </div>

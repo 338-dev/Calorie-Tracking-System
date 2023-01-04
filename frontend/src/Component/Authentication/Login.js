@@ -50,9 +50,18 @@ console.log(cookies)
         duration: 2000,
         isClosable: true,
       })  
-      setCookie('token', data.data.jwt, { path: '/' });
-      setCookie('time', new Date().getTime()+1000*5*3600, { path: '/' });
-      navigate('/')
+
+      // async function settingCookie(){
+        setCookie('token', data.data.jwt, { path: '/' });
+        setCookie('time', new Date().getTime()+1000*5*3600, { path: '/' });
+      // }
+      
+      // fetchUser(cookies)
+      // settingCookie.then(()=>{
+        setTimeout(() => {
+          navigate('/')          
+        }, 3000);
+      // }) 
       console.log(data)
     })
     .catch(err=>{

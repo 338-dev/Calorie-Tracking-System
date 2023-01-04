@@ -2,7 +2,6 @@ const initialState = {
     loading: false,
     userLoading:false,
     foodDetailsLoading:false,
-    bikes: [],
     foodDetails: [],
     allUsers:[],
     error: '',
@@ -22,11 +21,6 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
     switch (action.type) {
-      case 'FETCH_BIKES_REQUEST':
-        return {
-          ...state,
-          loading: true
-        }
         case 'FETCH_FOOD_PAGE_CHANGE_REQUEST':
           return {
             ...state,
@@ -97,20 +91,21 @@ const reducer = (state = initialState, action) => {
             }
         case 'FETCH_USER_FAILURE':
           return {
+            ...state,
             userLoading: false,
-            bikes: [],
-            allBikes:[],
             userError: action.payload,
             user:[]
           }
           case 'FETCH_FOOD_DETAILS_FAILURE':
             return {
+              ...state,
               foodDetailsLoading: false,
               foodDetails: [],
               foodDetailsError: action.payload,
             }
             case 'FETCH_REPORT_DETAILS_FAILURE':
               return {
+                ...state,
                 reportLoading: false,
                 report: [],
                 reportError: action.payload,
@@ -122,9 +117,8 @@ const reducer = (state = initialState, action) => {
               }  
           case 'FETCH_ALL_USERS_FAILURE':
             return {
+              ...state,
               loading: false,
-              bikes: [],
-              allBikes:[],
               usersError: action.payload,
               user:[]
             }

@@ -1,5 +1,5 @@
 import { Avatar, Box, Card, CardBody, Center, CircularProgress, Flex, Spacer, Text } from '@chakra-ui/react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useCookies } from 'react-cookie'
 import { connect } from 'react-redux'
 import { Navigate, useNavigate } from 'react-router-dom'
@@ -10,23 +10,30 @@ import { Pagination } from 'antd'
 
 export const AllUsers = ({state,fetchAllUsers,fetchChangedUserPage}) => {
   const [cookies, setCookie] = useCookies(["user"]);
+  let [page, setPage] = useState(1);
+
    const navigate=useNavigate()
   useEffect(() => {
     console.log('ifuwh438w')
-
+console.log(state)
     fetchAllUsers(cookies,1)
 
-    console.log('2313qd2e')
+    console.log('2313qd2e') 
   }, [])
 
-  const handleChange = (e, p) => {
-    // setPage(p);
+  const handleChange = (p) => {
+    console.log(state)
+    if(p<1 || p>state.totalUsersPages)
+      {
+        return
+      }
+    setPage(p);
     fetchAllUsers(cookies,p)
     fetchChangedUserPage(p)
   }
-  console.log(state.allUsers)
+  console.log(state)
 
-  return(state.loading)?(<Center verticalAlign='middle'>
+  return(state.loading || state.allUsers.length===0)?(<Center verticalAlign='middle'>
   <CircularProgress isIndeterminate size='100px' thickness='4px' />
   </Center>):(state.usersError)?(<Navigate to='/'/>):(<>
     <Navbar/>
@@ -51,13 +58,19 @@ export const AllUsers = ({state,fetchAllUsers,fetchChangedUserPage}) => {
     }
 
     
-<Center mt="10">
+<Center m="10">
 
-<Pagination 
-  pageSize={5}
-  current={state.currentUserPage}
-  total={state.totalUsersPages}
-  onChange={handleChange}/>
+<nav aria-label="Page navigation example">
+  <ul className="pagination">
+  <li className="page-item" onClick={()=>handleChange(page-1)}><a className="page-link" style={{'cursor':'pointer'}}>Previous</a></li>
+    {
+      Array.from({length: state.totalUsersPages}, (_, i) => i + 1).map((value,key)=>(
+        <li className="page-item" key={key} onClick={()=>{handleChange(value)}}><a className="page-link" style={{'cursor':'pointer'}}>{value}</a></li>
+      ))
+    }
+    <li className="page-item" style={{'cursor':'pointer'}} onClick={()=>handleChange(page+1)}><a className="page-link">Next</a></li>
+  </ul>
+</nav>
 </Center>
 
     </>)

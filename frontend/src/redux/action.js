@@ -14,6 +14,7 @@ import { useCookies } from 'react-cookie';
             })
         .then(response => {
           const events = response.data
+          console.log(events)
           dispatch(fetchAllUsersSuccess(events[0]))
           dispatch(fetchAllUsersPages(events[1]))
   
@@ -86,6 +87,8 @@ import { useCookies } from 'react-cookie';
         .then((data)=>{
             console.log(data.data)
             dispatch(fetchFoodDetailsSuccess(data.data[0]))
+            dispatch(fetchTotalPages(data.data[1]))
+
         })
         .catch(error => {
           
@@ -227,6 +230,7 @@ export const fetchReportDetailsSuccess = events => {
 export const fetchFilterIsSet = (event) => {
   return {
     type: 'FETCH_FILTER_IS_SET',
+    payload: event
   }
 }
 
