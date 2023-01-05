@@ -5,15 +5,18 @@ import { AddIcon } from '@chakra-ui/icons'
 import Joi from 'joi';
 import axios from 'axios';
 import { useCookies } from 'react-cookie';
-import { fetchFoodDetails, fetchUser } from '../../redux/action';
+import { fetchFoodDetails, fetchFoodDetailsByUsers, fetchUser } from '../../redux/action';
+import { useParams } from 'react-router-dom';
 
 
 
-export const EditModal = ({detail,fetchFoodDetails}) => {
+export const EditModal = ({detail,fetchFoodDetails,fetchFoodDetailsByUsers}) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [cookies, setCookie] = useCookies(["user"]);
   const toast = useToast()
+  const {id}=useParams();
+
   const [foodDetails, setFoodDetails] = useState({
     name:'',
     calorie:'',
@@ -35,7 +38,7 @@ export const EditModal = ({detail,fetchFoodDetails}) => {
     })
   }, [detail])
 
-  const saveDetails=(id)=>{
+  const saveDetails=(foodId)=>{
     setFoodDetails({...foodDetails,name:foodDetails.name.trim(),price:Number(foodDetails.price),calorie:Number(foodDetails.calorie)})
     const result = schema.validate(foodDetails);
 
@@ -43,7 +46,7 @@ console.log(result);
 const { error } = result;
 
 if (!error) {
-  axios.put(`http://localhost:3001/food/${id}/update`,foodDetails,{
+  axios.put(`http://localhost:3001/food/${foodId}/update`,foodDetails,{
                 headers:{
                   jwt: cookies.token
                 }
@@ -56,7 +59,7 @@ if (!error) {
       isClosable: true,
     })  
     onClose()
-    fetchFoodDetails(cookies,1)
+    fetchFoodDetailsByUsers(cookies,id,1)
     // clearFoodDetails()
     console.log(data)
   })
@@ -136,6 +139,8 @@ const mapDispatchToProps = dispatch => {
   return{
       fetchUser: (cookie) => dispatch(fetchUser(cookie)),
       fetchFoodDetails: (cookie,pg) => dispatch(fetchFoodDetails(cookie,pg)),
+      fetchFoodDetailsByUsers: (cookie,id,pg) => dispatch(fetchFoodDetailsByUsers(cookie,id,pg)),
+
   }
 }
 

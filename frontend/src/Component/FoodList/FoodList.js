@@ -118,8 +118,8 @@ export const FoodList = ({state,fetchUser,fetchFoodDetails,fetchFoodDetailsByUse
        
       {
         Object.keys(state.foodDetails[value]['days'][val]['food']).map((vall,keee)=>(
-            
-        <Card minW="230px" maxW="300px" m="20px" key={keee}>
+
+        <Card w="230px" m="20px" key={keee}>
            {/* <IconButton
         variant='ghost'
         colorScheme='gray'

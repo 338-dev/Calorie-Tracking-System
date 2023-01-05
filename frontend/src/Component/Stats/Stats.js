@@ -27,7 +27,7 @@ export const Stats = ({state,fetchReportDetailsByUsers}) => {
   </Center>):(
     <div>
       <Navbar/>
-      <Text fontSize='6xl'>Stats of {state.user.name}</Text>
+      <Text fontSize='6xl'>User Report</Text>
       <Center>
       <Flex gap='3' mt='10'>
         <Box>
@@ -139,7 +139,7 @@ Past Last week Entries
       }
       </Grid></>}
 
-      {state.report.avgCalories&&<><Text fontSize="3xl" mt="10px" ml="20px">
+      {state.report.avgCalories && state.report.pastWeekEntry.length!==0 && <><Text fontSize="3xl" mt="10px" ml="20px">
         Last Week average calorie intake
       </Text>
       <Card w="230px" m="20px">

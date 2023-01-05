@@ -12,7 +12,9 @@ export const Navbar = (props) => {
     removeCookie('token')
     removeCookie('time')
 
-    navigate('/login')
+    setTimeout(() => {
+      navigate('/login')      
+    }, 2000);
   }
   return (
     <Flex bg='white' boxShadow='lg' p='4' rounded='md'>

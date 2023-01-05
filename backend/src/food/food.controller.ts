@@ -18,7 +18,6 @@ import * as Joi from 'joi';
 
 const schema = Joi.object({
   name: Joi.string().trim().min(3).max(30).required(),
-  date: Joi.date().max(new Date()).required(),
   calorie:Joi.number().min(.01).max(100).allow('').optional(),
   price:Joi.number().min(.02).max(10).required(),
 });
@@ -71,6 +70,17 @@ export class foodController {
     {
       throw new BadRequestException("Page or Id value should be a number")
     }
+
+    const user = await User.findOne({where: {id}});
+    console.log('user')
+    console.log(user)
+
+    if(user===null || !user)
+    {
+      throw new BadRequestException("No user with given id")
+
+    }
+
     return this.foodService.findById(id,pg);
   }  
 
@@ -87,6 +97,16 @@ export class foodController {
     {
       throw new BadRequestException("Page value should be a number")
     }
+    const user = await User.findOne({where: {id}});
+    console.log('user')
+    console.log(user)
+
+    if(user===null || !user)
+    {
+      throw new BadRequestException("No user with given id")
+
+    }
+
 
     return this.foodService.findReportById(id);
   }  
@@ -118,6 +138,7 @@ export class foodController {
 
       }
       console.log(1234)
+      console.log(dates)
       const user = await User.findOne({where: {id}});
     return this.foodService.findByDates(user.role,id,dates,pg);
   }  
@@ -161,13 +182,18 @@ export class foodController {
       const decoded:any = jwt.verify(token,'secret');
       const userId = decoded.id;
 
-      const result = schema.validate(foodData);
+      if(new Date(foodData.date).getTime()>new Date().getTime())
+      {
+        throw new BadRequestException("Invalid date")
+      }
+      const result = schema.validate({name:foodData.name,price:foodData.price,calorie:foodData.calorie});
       foodData={...foodData,name:foodData.name.trim(),date:new Date(foodData.date).toString()}
 
       console.log(foodData)
       const { error } = result;
       if(error)
       {
+        console.log(error)
         throw new BadRequestException(result.error.message)
       }
       return this.foodService.create({...foodData,addedBy:userId});
